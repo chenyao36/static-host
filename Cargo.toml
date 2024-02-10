@@ -1,0 +1,16 @@
+[package]
+name = "static_host"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+log = "0.4"
+env_logger = "0.10"
+clap = { version = "4.3", features = ["derive", "env"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+kdam = "0.3"
+actix-files = "0.6"
+actix-web = "4"
+actix-proxy ="0.2"
+awc = "3"
