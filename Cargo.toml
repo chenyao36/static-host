@@ -6,8 +6,8 @@ edition = "2021"
 [dependencies]
 log = "0.4"
 env_logger = "0.10"
-clap = { version = "4.3", features = ["derive", "env"] }
-serde = { version = "1.0", features = ["derive"] }
+clap = { version = "4", features = ["derive", "env"] }
+serde = { version = "1", features = ["derive"] }
 serde_json = "1.0"
 kdam = "0.3"
 actix-files = "0.6"

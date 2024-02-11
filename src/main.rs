@@ -8,21 +8,20 @@ use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
 struct CliArgs {
-    /// 如果是文件:
-    ///     会作为 json 被读取, 形式为 { "url": { ... } }
-    ///     可配置项:
-    ///         作为目录: (配置空字典时)
-    ///             path: str. 这个 url 要 serve 哪个目录. 默认把 url 本身当作一个目录.
-    ///             index: str. 访问目录时, 若有 index 就给出. 默认 index.html.
-    ///             dir: bool. 访问到目录且没有 index 时, 是否列出文件. 默认 true.
-    ///         作为转发:
-    ///             proxy_to: str. 转发这个 url 去哪里.
-    ///                            例如: "/api": { "http://example.com/api/v1" } 可以转发 /api/test?a=3 到 http://example.com/api/v1/test?a=3.
-    /// 如果是目录:
-    ///     等同于一个只包含 { "/": { "path": "该目录" } } 的配置文件.
-    /// 如果不设置:
-    ///     如果当前目录下有 static_host.json, 就读取它;
-    ///     否则等同于使用当前目录.
+    /// 1) If given a JSON file, mapping url to:
+    ///     1.1) a directory:
+    ///         path: str. Which directory to serve at this url. Default to the url itself.
+    ///         index: str. Which file to return accessing a directory. Default to `index.html`.
+    ///         dir: bool. For a directory without an index file, whether or not to present its
+    ///         content. Default to `true`.
+    ///     1.2) another url:
+    ///         proxy_to: str. Where to forward this request..
+    ///                        e.g. `"/api/get": { "proxy_to": "https://httpbin.org/get" }`
+    ///                        forward `/api/get?ans=42` to `https://httpbin.org/get?ans=42`.
+    /// 2) If given a directory: Serve this directory at `/`.
+    /// 3) If left empty:
+    ///     3.1) if `./static_host.json` exists, then use it;
+    ///     3.2) otherwise, serve `./` at `/`.
     #[arg(verbatim_doc_comment)]
     config: Option<PathBuf>,
     #[arg(long, default_value_t = 8081)]
@@ -73,7 +72,7 @@ impl ConfigFile {
                 if default_path.exists() {
                     Self::from_config_path(Some(default_path))?
                 } else {
-                    Self::from_directory(std::env::current_dir().expect("当前目录异常"))
+                    Self::from_directory(std::env::current_dir().expect("current directory error"))
                 }
             }
             Some(path) => {
